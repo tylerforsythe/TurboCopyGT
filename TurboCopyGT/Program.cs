@@ -64,7 +64,7 @@ namespace TurboCopyGT
         }
 
         private static void CopyAllFilesLimitedThreads(CopyDetails details) {
-            Console.WriteLine($"CopyAllFiles: {details.Files.Count}");
+            Console.WriteLine($"CopyAllFiles: {details.Files.Count:N0}");
             var filesPerThread = (details.Files.Count / TOTAL_THREADS) + 1;
 
             for (var i = 0; i < TOTAL_THREADS; ++i) {
@@ -84,7 +84,7 @@ namespace TurboCopyGT
         /// In my testing, I cut 22s to 16s. Same files, but 35% of time in thread overhead.
         /// </summary>
         private static void CopyAllFilesThreadForEach(CopyDetails details) {
-            Console.WriteLine($"CopyAllFiles: {details.Files.Count}");
+            Console.WriteLine($"CopyAllFiles: {details.Files.Count:N0}");
 
             foreach (var sourceFilePath in details.Files) {
                 var destFilePath = sourceFilePath.Replace(details.SourcePath, details.DestPath);
@@ -101,7 +101,7 @@ namespace TurboCopyGT
             int startIndex = param.StartIndex;
             int endIndex = param.EndIndex;
             var details = param.CopyDetails;
-            foreach (var sourceFilePath in details.Files.Skip(startIndex).Take(endIndex - startIndex)) {
+            foreach (var sourceFilePath in details.Files.Skip(startIndex).Take(endIndex - startIndex + 1)) {
                 var destFilePath = sourceFilePath.Replace(details.SourcePath, details.DestPath);
                 if (sourceFilePath == destFilePath) // should never happen!?!
                     continue;
@@ -115,7 +115,7 @@ namespace TurboCopyGT
 
 
         private static void CreateAllDirectories(CopyDetails details) {
-            Console.WriteLine($"CreateAllDirectories: {details.Directories.Count}");
+            Console.WriteLine($"CreateAllDirectories: {details.Directories.Count:N0}");
             foreach (var d in details.Directories) {
                 var newPath = d.Replace(details.SourcePath, details.DestPath);
                 if (newPath == d)
