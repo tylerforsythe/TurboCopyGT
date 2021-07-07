@@ -14,7 +14,7 @@ namespace TurboCopyGT
             Console.WriteLine("Hello World!");
             _smartThreadPool = new SmartThreadPool();
             _smartThreadPool.MaxThreads = 28;
-            
+
             var details = new CopyDetails();
             details.SourcePath = @"C:\temp\mblf-node-modules-20210625";
             details.DestPath = @"H:\temp\mbl_build\copy-test-destination";
@@ -22,7 +22,7 @@ namespace TurboCopyGT
             // delete everything in dest
             Console.WriteLine("Deleting dest (this is for testing only)");
             DeleteEverythingInDirectory(details.DestPath);
-            
+
             var startDt = DateTime.Now;
 
             // scan for all directories and files in src
@@ -36,16 +36,25 @@ namespace TurboCopyGT
             Console.WriteLine("Start copy-threading...");
             CopyAllFiles(details);
             Console.WriteLine("Waiting for copy-threads to finish");
-            
+
             _smartThreadPool.WaitForIdle();
             Console.WriteLine("_smartThreadPool idle achieved");
 
             var endDt = DateTime.Now;
             var duration = endDt - startDt;
             Console.WriteLine($"Operation Stats:");
-            Console.WriteLine($"Files: {details.Files.Count}");
-            Console.WriteLine($"Directories: {details.Directories.Count}");
+            Console.WriteLine($"Files: {details.Files.Count:N0}");
+            Console.WriteLine($"Directories: {details.Directories.Count:N0}");
+            Console.WriteLine($"Total Bytes: {details.TotalBytes:N0}");
+            Console.WriteLine($"Bytes Formatted: {SizeSuffix(details.TotalBytes)}");
             Console.WriteLine($"Duration: {duration}");
+
+            // 20-24 seconds, 90-98 MB/s
+
+            var totalSeconds = (long)duration.TotalSeconds;
+            var bytesPerSecond = details.TotalBytes / totalSeconds;
+            Console.WriteLine($"{bytesPerSecond:N0} bytes/sec aka {SizeSuffix(bytesPerSecond)}/sec");
+
             Console.WriteLine($"DONE");
         }
 
@@ -57,7 +66,8 @@ namespace TurboCopyGT
                 if (sourceFilePath == destFilePath) // should never happen!?!
                     continue;
 
-                //var fi = new FileInfo(sourceFilePath);
+                var fi = new FileInfo(sourceFilePath);
+                details.TotalBytes += fi.Length;
                 //fi.CopyTo(destFilePath);
                 _smartThreadPool.QueueWorkItem(System.IO.File.Copy, sourceFilePath, destFilePath);
             }
@@ -77,10 +87,10 @@ namespace TurboCopyGT
         private static void DeleteEverythingInDirectory(string path) {
             System.IO.DirectoryInfo di = new DirectoryInfo(path);
             foreach (FileInfo file in di.GetFiles()) {
-                file.Delete(); 
+                file.Delete();
             }
             foreach (DirectoryInfo dir in di.GetDirectories()) {
-                dir.Delete(true); 
+                dir.Delete(true);
             }
         }
 
@@ -95,12 +105,28 @@ namespace TurboCopyGT
             }
         }
 
+        static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
+        static string SizeSuffix(Int64 value, int decimalPlaces = 1) {
+            if (value < 0) { return "-" + SizeSuffix(-value, decimalPlaces); }
+
+            int i = 0;
+            decimal dValue = (decimal)value;
+            while (Math.Round(dValue, decimalPlaces) >= 1000) {
+                dValue /= 1024;
+                i++;
+            }
+
+            return string.Format("{0:n" + decimalPlaces + "} {1}", dValue, SizeSuffixes[i]);
+        }
+
 
         public class CopyDetails
         {
             public CopyDetails() {
                 Directories = new List<string>();
                 Files = new List<string>();
+                TotalBytes = 0;
             }
 
             public List<string> Directories { get; set; }
@@ -108,6 +134,8 @@ namespace TurboCopyGT
 
             public string SourcePath { get; set; }
             public string DestPath { get; set; }
+
+            public long TotalBytes { get; set; }
         }
     }
 }
