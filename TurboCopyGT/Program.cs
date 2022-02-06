@@ -12,7 +12,7 @@ namespace TurboCopyGT
     {
         private static SmartThreadPool _smartThreadPool;
 
-        private static readonly int TOTAL_THREADS = (int)Math.Round(Environment.ProcessorCount * 2.6);
+        private static readonly int TOTAL_THREADS = (int)Math.Round(Environment.ProcessorCount * 1.8);
 
         static void Main(string[] args) {
             var testMode = false;
