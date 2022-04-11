@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="SmartThreadPool.NetCore" Version="2.3.0" />
+    <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0-alpha.22114.1" />
   </ItemGroup>
 
 </Project>
