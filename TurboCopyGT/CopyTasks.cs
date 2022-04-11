@@ -14,6 +14,10 @@ namespace TurboCopyGT
 
         public static void CopyAction(string sourcePath, string destinationPath) {
             Console.WriteLine($"Starting copy of {sourcePath} => {destinationPath}");
+            if (!Directory.Exists(sourcePath)) {
+                Console.WriteLine($"Source directory {sourcePath} does not exist. Exiting with no work performed.");
+                return;
+            }
 
             _smartThreadPool = new SmartThreadPool();
             _smartThreadPool.MaxThreads = TOTAL_THREADS;

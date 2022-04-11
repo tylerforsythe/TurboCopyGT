@@ -15,6 +15,10 @@ namespace TurboCopyGT
 
         public static void DeleteAction(string path) {
             Console.WriteLine($"Starting delete of path {path}");
+            if (!Directory.Exists(path)) {
+                Console.WriteLine($"Directory {path} does not exist. Exiting with no work performed.");
+                return;
+            }
 
             _smartThreadPool = new SmartThreadPool();
             _smartThreadPool.MaxThreads = TOTAL_THREADS;
