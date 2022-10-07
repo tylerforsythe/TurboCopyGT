@@ -20,7 +20,7 @@ but it is not multi-threaded and has no source code available.
 Usage
 -----
 
-`TurboCopyGT.exe --mode Copy --source-path C:\SourceDirectory\ --destination-path D:\DesinationDirectory\`
+`TurboCopyGT.exe --mode Copy --source-path C:\SourceDirectory --destination-path D:\DesinationDirectory`
 
 How It Works
 -----
@@ -36,3 +36,13 @@ in thread 2, you will not get optimal copy speeds. Faster than default Windows, 
 Additionally, if your data set is mostly very large files, you will not see a speed increase. As stated at the top, 
 this does not improve *sequential* read and write speeds. It excels at directories full of small files, which is the 
 scenario Windows is terrible at. Windows file copy works fine for large files, but poorly for large sets of very small files.
+
+Delete
+-----
+
+TurboCopyGT now also handles deleting huge amounts of files and is many times faster than Windows. It works similarly to the copy: it examines the entire directory structure, storing in-memory a list of all file paths. Then it splits that list into equal chunks based on how many threads are available, and then lets it all rip.
+
+Delete Usage
+-----
+
+`TurboCopyGT.exe --mode Delete --delete-path C:\DirectoryToDelete`
