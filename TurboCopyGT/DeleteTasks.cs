@@ -10,11 +10,11 @@ namespace TurboCopyGT
     {
         private static SmartThreadPool _smartThreadPool;
 
-        private static readonly int TOTAL_THREADS = (int)Math.Round(Environment.ProcessorCount * 1.5);
+        private static readonly int TOTAL_THREADS = (int)Math.Round(Environment.ProcessorCount * 1.0);
 
 
         public static void DeleteAction(string path) {
-            Console.WriteLine($"Starting delete of path {path}");
+            Console.WriteLine($"Starting {(RuntimeSettings.UseShuffle ? "shuffle " : "")}delete of path {path}");
             if (!Directory.Exists(path)) {
                 Console.WriteLine($"Directory {path} does not exist. Exiting with no work performed.");
                 return;
@@ -31,6 +31,8 @@ namespace TurboCopyGT
             // scan for all directories and files in src
             Console.WriteLine("Scanning");
             ScanTasks.ScanForAllDirectoriesAndFiles(details.SourcePath, details);
+            if (RuntimeSettings.UseShuffle)
+                ScanTasks.ShuffleFilesAndDirectories(details);
 
             Console.WriteLine($"Starting delete-threading with {TOTAL_THREADS} threads");
             DeleteAllFilesLimitedThreads(details);

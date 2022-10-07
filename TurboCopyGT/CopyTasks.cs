@@ -10,10 +10,10 @@ namespace TurboCopyGT
     {
         private static SmartThreadPool _smartThreadPool;
 
-        private static readonly int TOTAL_THREADS = (int)Math.Round(Environment.ProcessorCount * 1.5);
+        private static readonly int TOTAL_THREADS = (int)Math.Round(Environment.ProcessorCount * 1.0);
 
         public static void CopyAction(string sourcePath, string destinationPath) {
-            Console.WriteLine($"Starting copy of {sourcePath} => {destinationPath}");
+            Console.WriteLine($"Starting {(RuntimeSettings.UseShuffle ? "shuffle " : "")}copy of {sourcePath} => {destinationPath}");
             if (!Directory.Exists(sourcePath)) {
                 Console.WriteLine($"Source directory {sourcePath} does not exist. Exiting with no work performed.");
                 return;
@@ -34,6 +34,8 @@ namespace TurboCopyGT
             // scan for all directories and files in src
             Console.WriteLine("Scanning");
             ScanTasks.ScanForAllDirectoriesAndFiles(details.SourcePath, details);
+            if (RuntimeSettings.UseShuffle)
+                ScanTasks.ShuffleFilesAndDirectories(details);
 
             // create all directories in desc
             CreateAllDirectories(details);
